@@ -13,8 +13,8 @@ This template provides a starting point for Databricks Spark Declarative Pipelin
 To bootstrap a new project from this template:
 
 1. Copy this directory to your new project location
-2. Update `databricks.yml` with your project name and workspace details
-3. Modify the sample pipeline in `src/pipelines/example_pipeline.py`
+2. Update `databricks.yml` with your project name, catalog, and schema
+3. Modify the sample pipeline in `src/pipelines/basic_pipeline.py`
 4. Initialize git: `git init && git add . && git commit -m "Initial commit from lakeflow-sdp template"`
 
 ## Project Structure
@@ -24,7 +24,9 @@ To bootstrap a new project from this template:
 ├── databricks.yml           # Databricks Asset Bundle configuration
 └── src/
     └── pipelines/           # SDP pipeline definitions
-        └── example_pipeline.py
+        ├── basic_pipeline.py              # Simple medallion architecture
+        ├── advanced_flows_cdc_pipeline.py # Flows and CDC patterns
+        └── kafka_pipeline.py              # Kafka ingestion examples
 ```
 
 ## Key Concepts
