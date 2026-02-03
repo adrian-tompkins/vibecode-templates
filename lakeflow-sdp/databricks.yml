@@ -1,0 +1,53 @@
+# Databricks Asset Bundle configuration
+bundle:
+  name: "PROJECT_NAME"  # Replace with your project name
+
+workspace:
+  host: "{{workspace_host}}"  # Set via environment or profile
+
+targets:
+  dev:
+    mode: development
+    workspace:
+      root_path: "~/.bundle/${bundle.name}/dev"
+
+    resources:
+      pipelines:
+        main_pipeline:
+          name: "${bundle.name}_dev_pipeline"
+          target: "dev_catalog"
+          libraries:
+            - notebook:
+                path: ./src/pipelines/example_pipeline.py
+          clusters:
+            - label: "default"
+              num_workers: 1
+              node_type_id: "{{node_type_id}}"
+
+          configuration:
+            "pipelines.environment": "dev"
+
+  prod:
+    mode: production
+    workspace:
+      root_path: "/Shared/.bundle/${bundle.name}/prod"
+
+    resources:
+      pipelines:
+        main_pipeline:
+          name: "${bundle.name}_prod_pipeline"
+          target: "prod_catalog"
+          libraries:
+            - notebook:
+                path: ./src/pipelines/example_pipeline.py
+          clusters:
+            - label: "default"
+              num_workers: 2
+              node_type_id: "{{node_type_id}}"
+
+          configuration:
+            "pipelines.environment": "prod"
+
+          permissions:
+            - level: CAN_VIEW
+              group_name: "users"
