@@ -2,52 +2,47 @@
 bundle:
   name: "PROJECT_NAME"  # Replace with your project name
 
-workspace:
-  host: "{{workspace_host}}"  # Set via environment or profile
+########## Variables - Configure these to match your environment ##########
+
+variables:
+  catalog_name:
+    description: "The name of the catalog to deploy to"
+    default: "my_catalog"  # Replace with your catalog name
+
+  schema_name:
+    description: "The name of the schema to deploy to"
+    default: "my_schema"  # Replace with your schema name
+
+########## End of Variables ##########
 
 targets:
   dev:
-    mode: development
-    workspace:
-      root_path: "~/.bundle/${bundle.name}/dev"
+    default: true
+    presets:
+      source_linked_deployment: true
 
-    resources:
-      pipelines:
-        main_pipeline:
-          name: "${bundle.name}_dev_pipeline"
-          target: "dev_catalog"
-          libraries:
-            - notebook:
-                path: ./src/pipelines/example_pipeline.py
-          clusters:
-            - label: "default"
-              num_workers: 1
-              node_type_id: "{{node_type_id}}"
+# See more about resource configuration at https://docs.databricks.com/aws/en/dev-tools/bundles/resources
+resources:
 
-          configuration:
-            "pipelines.environment": "dev"
+  schemas:
+    main_schema:
+      name: ${var.schema_name}
+      catalog_name: ${var.catalog_name}
+      comment: This schema was created by Databricks Asset Bundles.
 
-  prod:
-    mode: production
-    workspace:
-      root_path: "/Shared/.bundle/${bundle.name}/prod"
+  pipelines:
+    main_pipeline:
+      name: "${workspace.current_user.userName} - ${bundle.name} Pipeline"
+      catalog: ${var.catalog_name}
+      schema: ${var.schema_name}
+      configuration:
+        catalog_name: ${var.catalog_name}
+        schema_name: ${var.schema_name}
+      libraries:
+        - notebook:
+            path: "src/pipelines/basic_pipeline.py"
+      serverless: true
+      photon: true
+      development: true
 
-    resources:
-      pipelines:
-        main_pipeline:
-          name: "${bundle.name}_prod_pipeline"
-          target: "prod_catalog"
-          libraries:
-            - notebook:
-                path: ./src/pipelines/example_pipeline.py
-          clusters:
-            - label: "default"
-              num_workers: 2
-              node_type_id: "{{node_type_id}}"
-
-          configuration:
-            "pipelines.environment": "prod"
-
-          permissions:
-            - level: CAN_VIEW
-              group_name: "users"
+# For more options and schema, see: https://docs.databricks.com/aws/en/dev-tools/bundles/settings
